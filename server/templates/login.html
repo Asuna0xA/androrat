@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura — Authentication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0a0f;
+            --bg2: #12121a;
+            --surface: #16213e;
+            --border: #252545;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --accent: #6366f1;
+            --accent2: #8b5cf6;
+            --red: #ef4444;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        /* Background Animation */
+        .blobs {
+            position: absolute;
+            width: 100%; height: 100%;
+            z-index: -1;
+            filter: blur(80px);
+        }
+        .blob {
+            position: absolute;
+            width: 400px; height: 400px;
+            background: var(--accent);
+            opacity: 0.1;
+            border-radius: 50%;
+            animation: move 20s infinite alternate;
+        }
+        .blob-2 { background: var(--accent2); top: 50%; left: 60%; animation-delay: -5s; }
+        @keyframes move {
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(10%, 10%); }
+        }
+
+        .login-card {
+            background: rgba(18, 18, 26, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .logo-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.4);
+        }
+        h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        p.subtitle { color: var(--text2); font-size: 14px; margin-bottom: 32px; }
+
+        .form-group { text-align: left; margin-bottom: 24px; }
+        label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text2); }
+        input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px 12px 44px;
+            color: var(--text);
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+        button:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
+        button:active { transform: translateY(0); }
+
+        .error-msg {
+            color: var(--red);
+            font-size: 13px;
+            margin-top: 16px;
+            display: {{ 'block' if error else 'none' }};
+        }
+    </style>
+</head>
+<body>
+    <div class="blobs">
+        <div class="blob"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="login-card">
+        <div class="logo-icon"><i class="fas fa-key"></i></div>
+        <h1>Aura C2</h1>
+        <p class="subtitle">Enter access key to continue</p>
+
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label>Access Key</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-shield-alt"></i>
+                    <input type="password" name="password" placeholder="••••••••••••" required autofocus>
+                </div>
+            </div>
+            <button type="submit">Authenticate</button>
+        </form>
+
+        {% if error %}
+        <div class="error-msg">
+            <i class="fas fa-exclamation-circle"></i> Invalid authentication key.
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

