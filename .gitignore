@@ -17,6 +17,8 @@ Android_Code/.gradle/
 Android_Code/build/
 Android_Code/app/build/
 Android_Code/local.properties
+Android_Code/*.log
+
 
 # Test/dump files
 /Dumps
